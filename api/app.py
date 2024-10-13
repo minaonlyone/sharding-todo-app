@@ -31,5 +31,45 @@ def add_todo():
 
     return jsonify({"message": "To-Do added successfully!"})
 
+@app.route('/todo/<int:user_id>', methods=['GET'])
+def get_todos(user_id):
+    conn = get_shard(user_id)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, user_id, description FROM todos WHERE user_id = %s", (user_id,))
+    todos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify([{"id": todo[0], "user_id": todo[1], "description": todo[2]} for todo in todos])
+
+@app.route('/todo/<int:todo_id>', methods=['PUT'])
+def update_todo(todo_id):
+    data = request.json
+    user_id = data.get('user_id')
+    description = data.get('description')
+
+    conn = get_shard(user_id)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE todos SET description = %s WHERE id = %s AND user_id = %s", (description, todo_id, user_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "To-Do updated successfully!"})
+
+@app.route('/todo/<int:todo_id>', methods=['DELETE'])
+def delete_todo(todo_id):
+    data = request.json
+    user_id = data.get('user_id')
+
+    conn = get_shard(user_id)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM todos WHERE id = %s AND user_id = %s", (todo_id, user_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "To-Do deleted successfully!"})
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
