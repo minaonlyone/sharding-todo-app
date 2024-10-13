@@ -1,0 +1,57 @@
+name: CI/CD for Sharding To-Do App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+        ports:
+          - 5433:5433
+          - 5434:5434
+          - 5435:5435
+          - 5000:5000
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Build and Run Docker Containers
+      run: |
+        docker-compose up -d
+        sleep 10  # Give containers some time to initialize
+
+    - name: Set up To-Do Schema in Shards
+      run: |
+        chmod +x create_shard_schema_script.sh
+        ./create_shard_schema_script.sh
+
+    - name: Install Python Dependencies
+      run: |
+        pip install -r api/requirements.txt
+
+    - name: Run Tests
+      run: |
+        python test_app.py
