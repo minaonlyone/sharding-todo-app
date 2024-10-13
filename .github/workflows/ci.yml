@@ -41,7 +41,7 @@ jobs:
     - name: Build and Run Docker Containers
       run: |
         docker-compose up -d
-        sleep 10  # Give containers some time to initialize
+        sleep 30  # Give containers enough time to initialize
 
     - name: Set up To-Do Schema in Shards
       run: |
@@ -52,6 +52,13 @@ jobs:
       run: |
         pip install -r api/requirements.txt
 
+    - name: Start API
+      run: |
+        nohup python api/app.py &
+      env:
+        FLASK_ENV: development
+
     - name: Run Tests
       run: |
+        sleep 10  # Give some time for the API to be up and running
         python test_app.py
