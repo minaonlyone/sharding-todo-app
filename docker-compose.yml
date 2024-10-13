@@ -1,0 +1,42 @@
+version: '3'
+services:
+  shard1:
+    image: postgres:latest
+    container_name: shard1
+    environment:
+      POSTGRES_USER: shard_user
+      POSTGRES_PASSWORD: shard_password
+      POSTGRES_DB: todo_shard1
+    ports:
+      - "5433:5432"
+    volumes:
+      - shard1_data:/var/lib/postgresql/data
+
+  shard2:
+    image: postgres:latest
+    container_name: shard2
+    environment:
+      POSTGRES_USER: shard_user
+      POSTGRES_PASSWORD: shard_password
+      POSTGRES_DB: todo_shard2
+    ports:
+      - "5434:5432"
+    volumes:
+      - shard2_data:/var/lib/postgresql/data
+
+  shard3:
+    image: postgres:latest
+    container_name: shard3
+    environment:
+      POSTGRES_USER: shard_user
+      POSTGRES_PASSWORD: shard_password
+      POSTGRES_DB: todo_shard3
+    ports:
+      - "5435:5432"
+    volumes:
+      - shard3_data:/var/lib/postgresql/data
+
+volumes:
+  shard1_data:
+  shard2_data:
+  shard3_data:
