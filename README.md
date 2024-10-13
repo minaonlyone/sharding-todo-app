@@ -19,11 +19,12 @@ This repository provides an example of how to use database sharding with Postgre
    git clone https://github.com/minaonlyopne/sharding-todo-app.git
    cd sharding-todo-app
 2. Run Docker Compose to create the shards:
-
     ```bash
     docker-compose up -d
 3. Set up the schema in each shard:
-
+    ```bash
+    chmod +x create_shard_schema_script.sh
+    ./create_shard_schema_script.sh
 4. Install Python dependencies:
     ```bash
     pip install -r api/requirements.txt
